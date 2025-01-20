@@ -1,4 +1,4 @@
-# Below is a recommended order for creating these documents so each naturally builds upon the previous. This sequence ensures we first set the project context (overview, user flow, tech decisions), then define our rules (tech stack, UI, theme, code organization), and finally outline our phased approach and detailed workflows.
+## Below is a recommended order for creating these documents so each naturally builds upon the previous. This sequence ensures we first set the project context (overview, user flow, tech decisions), then define our rules (tech stack, UI, theme, code organization), and finally outline our phased approach and detailed workflows.
 
 1. @project-overview.md
    - Establish overall project purpose, scope, and goals.
@@ -31,7 +31,7 @@
    - Similarly, provide a systematic approach for creating or updating back-end logic, route handlers, and real-time functionality.
 
 
-# Below are recommended steps/prompts for creating these files from scratch, with only the project overview to guide you.
+## Below are recommended steps/prompts for creating these files from scratch, with only the project overview to guide you.
 
 1. `o1`
 ```
@@ -59,9 +59,9 @@ Put this in a markdown file called `tech-stack-options.md`.
 4. `claude` NOTE: Give it back your final stack choices, and ask it to evaluate it for compatibility. If it looks good to you, ask it to clean @tech-stack-options.md to only include your decisions, then proceed.
 
 
-5. `o1`
+5. `o1` NOTE: Make sure you've finalized @tech-stack-options.md and renamed it to @tech-stack.md.
 ```
-Use @tech-stack-options.md to create a document called `tech-stack-rules.md`.
+Use @tech-stack.md to create a document called `tech-stack-rules.md`.
 This file should cover all best-practices, limitations, and conventions for using the selected technologies.
 It should be thorough, and include important considerations and common pitfalls for each technology.
 
