@@ -3,51 +3,102 @@
 1. @project-overview.md
    - Establish overall project purpose, scope, and goals.
 
-2. @project-map.md
+2. @user-stories.md
+   - Break down the user stories for each user type (customers, agents, admins, unauthenticated users).
+
+3. @project-map.md
    - Generate site map 
 
-3. @user-flow.md
+4. @user-flow.md
    - Clarify how users will interact with the application (registration, navigation, messaging flows).
 
-4. @tech-stack.md
+5. @technical-requirements.md
+   - Generate comprehensive overview of the data models, core functionality, authorization, and real-time requirements needed to fulfill the user stories and features we’ve outlined.
+
+6. @data-model.md
+   - Break down the data models and relationships needed for our project.
+  
+7. @core-functionality.md
+   - Break down the core functionality requirements for our project.
+
+8. @important-considerations.md
+   - Break down the important considerations for our project.
+
+9.  @system-architecture.md
+   - Provide segmented overview of our project’s system architecture, including api routes. 
+
+10. @product-requirements.md
+   - Create actionable and implementation-ready set of requirements for our project.
+
+11. @tech-stack.md
    - Describe the core technologies used (Node, Next.js, TypeScript, etc.) and their roles.
 
-5. @tech-stack-rules.md
+12. @tech-stack-rules.md
    - Lay out best practices, limitations, and conventions for using the selected technologies.
 
-6. @ui-rules.md
+13. @ui-rules.md
    - Define visual and interaction guidelines for building components (including accessibility and design principles).
 
-7. @theme-rules.md
+14. @theme-rules.md
    - Establish theming foundations (colors, typography, animations) to be incorporated into UI development.
 
-8. @codebase-best-practices.md  
+15. @codebase-best-practices.md  
    - Outline folder structure, file naming conventions, and Next.js App Router practices.
 
-9. ./checklists/
+16. ./checklists/
    - Outline the different phases of the project, and the different tasks and features we'll need to complete in order to complete our goal. Each feature (or group of features) should have its own phase document.
 
-10. @ui-workflow-checklist.md  
+17.  @ui-workflow-checklist.md  
     - Provide a step-by-step "state machine" for implementing or modifying front-end/UI features in detail.
 
-11. @backend-workflow-checklist.md  
+18.  @backend-workflow-checklist.md  
     - Similarly, provide a systematic approach for creating or updating back-end logic, route handlers, and real-time functionality.
 
 
+<hr></hr>
+
 ## Below are recommended steps/prompts for creating these files from scratch, with only the project overview to guide you.
+
 
 1. `o1`
 ```
-Use @project-overview.md to create a document called `project-map.md`, which should be a high-level website map (site structure).
+Use @project-overview.md to create a document called `user-stories.md`. This document should consider four types of users:
+Customers
+Agents (employees)
+Admins
+Unauthenticated Users
 
-It should be organized by user type (unauthenticated visitors, customers, agents, and admins), with each section linking back to features described in the specs.
+Think step by step about these four user types and their needs. For each role:
+
+Identify their main goals
+List their key permissions
+Describe their typical workflows
+
+Frame your analysis as detailed user stories that capture:
+
+What they need to accomplish
+Why they need it
+How they'll interact with the system
+
+Output the user stories by role in a numbered list. 
 
 Provide the file in markdown format.
 ```
 
+
 2. `o1`
 ```
-Use @project-overview and @project-map.md to create a document called `user-flow.md`, which should define the user journey through different segments of the map (i.e. Auth, Groups, Channels, etc). 
+Use @project-overview.md and @user-stories.md to create a document called `project-map.md`, which should be a high-level website map (site structure).
+
+It should be organized by user type (unauthenticated visitors, customers, agents, and admins), with each section linking back to features described in the specs. Make this thorough and exhaustive so it can be a reliable reference for other parts of the build process.
+
+Provide the file in markdown format.
+```
+
+
+3. `o1`
+```
+Use @project-overview, @user-stories.md, and @project-map.md to create a document called `user-flow.md`, which should define the user journey through different segments of the map. 
 
 The user journey should take into account the different features the app has & how they are connected to one-another. This document will later serve as a guide for building out our project architecture and UI elements.
 
@@ -55,9 +106,91 @@ Provide the file in markdown format.
 ```
 
 
-3. `o1` NOTE: if you have any stack preferences, mention them here. It will make a much better plan that way.
+4. `o1`
 ```
-Use @project-overview.md and @user-flow.md to make recommendations for our stack. I already know I want to use TypeScript, React, Tailwind, Shadcn, and Supabase.
+Use @project-overview.md, @user-stories.md, @project-map.md, and user-flow.md to create a document called `technical-requirements.md`, which should be a thorough and exhaustive list of technical requirements.
+
+Think step by step about:
+
+What data models we need to store
+What fields each model requires
+Relationships between models
+
+Frame your response as:
+
+- Data Models with fields and relationships
+- Core functionality requirements
+- Other considerations
+   - Authorization requirements with supabase built-in auth
+      - Consider a single, top-layer Auth provider
+   - Realtime requirements with supabase built-in functionality
+      - Consider realtime subscription requirements to avoid frequent reloads and latency issues, which can be caused by realtime data modifications triggering notifications to all subscribed clients
+      - Consider partial updates over full refetch, where appropriate
+   - Storage requirements with supabase built-in storage
+   - State management requirements
+   - Well architected and well named tables and relations in the database
+   - Code modularity and reusability
+
+Provide the file in markdown format. 
+```
+
+
+5. `claude` agent
+```
+breakdown @technical-requirements into three additional documents:
+`data-model.md`
+`core-functionality.md`
+`important-considerations.md`
+```
+
+
+6. `o1` 
+```
+Use @data-model.md, @core-functionality.md, and @important-considerations.md to create a document called `system-architecture.md` for our zendesk clone app. Think step by step about:
+
+1. Define API endpoints needed for each data model
+2. Plan the component hierarchy and page structure
+3. Outline key middleware and auth flows
+
+Frame your response as:
+1. API Routes with HTTP methods and auth requirements
+2. Page structure and components needed
+3. Key middleware functions
+
+Number each item and use single, clear sentences. Focus on what we need for implementation. 
+
+Provide the file in markdown format. 
+```
+
+
+7. `o1`
+```
+Use @system-architecture.md, @data-model.md, @core-functionality.md, and @important-considerations.md to create a document called `product-requirements.md`. This should provide a roadmap for delivering our project efficiently.
+
+Structure our PRD as follows:
+
+Project Overview (2-3 sentences max)
+Core Workflows (numbered list, one sentence each)
+Technical Foundation
+
+Data models
+API endpoints
+Components to be used
+
+Keep each point actionable and implementation-ready. Use clear, direct language with no fluff. but be exhaustive and include everything we will need. 
+
+Provide the file in markdown format. 
+```
+
+
+8. `o1` NOTE: if you have any stack preferences, mention them here. It will make a much better plan that way.
+```
+Use  @project-overview.md , @project-map.md , and @user-flow.md to make recommendations for our stack. I already know I want to use: 
+
+Frontend: TypeScript, Vite/React, Tailwind, Shadcn
+Backend: postgres on Supabase for the backend 
+Other Supabase features: Realtime, Auth, Storage, pgvector,
+AI endpoint: Langchain and fastapi
 
 For each anticipated part of our stack, propose and describe an industry standard and a popular alternative, as well as a list of 1 or more other options. We will work through the list together to determine what we'll use for the project.
 
@@ -65,13 +198,13 @@ Put this in a markdown file called `tech-stack-options.md`.
 ```
 
 
-4. `claude` USER ACTION: Look through the proposed file and think about what you want to pick. For ones you're unsure of, talk to Claude about pros/cons, have it look at the other selections from the stack to maybe see what's most compatible, etc.
+9. `claude` USER ACTION: Look through the proposed file and think about what you want to pick. For ones you're unsure of, talk to Claude about pros/cons, have it look at the other selections from the stack to maybe see what's most compatible, etc.
 
 
-5. `claude` NOTE: Give it back your final stack choices, and ask it to evaluate it for compatibility. If it looks good to you, ask it to clean @tech-stack-options.md to only include your decisions, then proceed.
+10. `claude` NOTE: Give it back your final stack choices, and ask it to evaluate it for compatibility. If it looks good to you, ask it to clean @tech-stack-options.md to only include your decisions, then proceed.
 
 
-6. `o1` NOTE: Make sure you've finalized @tech-stack-options.md and renamed it to @tech-stack.md.
+11. `o1` NOTE: Make sure you've finalized @tech-stack-options.md and renamed it to @tech-stack.md.
 ```
 Use @tech-stack.md to create a document called `tech-stack-rules.md`.
 This file should cover all best-practices, limitations, and conventions for using the selected technologies.
@@ -81,7 +214,7 @@ Provide the file in markdown format.
 ```
 
 
-7. `o1` NOTE: If you don't know much about UI, UX, design, or theming, this is a great opportunity to learn.
+12. `o1` NOTE: If you don't know much about UI, UX, design, or theming, this is a great opportunity to learn.
 ```
 I want to learn more about common design principles, and how they might be applied to our project.
 Give me a list of 15 possible themes (e.g. "minimalist", "retro", "futuristic", "glassmorphic", etc), with a description of each one.
@@ -89,7 +222,7 @@ Observe @project-overview.md and @user-flow.md for context about the project to 
 ```
 
 
-8. `o1` NOTE: Edit the blank spaces in the prompt to suit your desires for the project.
+13. `o1` NOTE: Edit the blank spaces in the prompt to suit your desires for the project.
 ```
 I want my project to be ____ (mobile-first, responsive, animated, etc). We need to define the visual and interaction guidelines for building components (including accessibility and design principles), as well as any tie-ins with the tech stack (consider our backend, for example).
 
@@ -99,7 +232,7 @@ Use @user-flow.md, @tech-stack.md, and @tech-stack-rules.md to put together two 
 ```
 
 
-9. `o1`
+14. `o1`
 ```
 We need to define our project's folder structure, file naming conventions, and any other rules we need to follow.
 
@@ -111,7 +244,7 @@ Use @tech-stack.md, @tech-stack-rules.md, @ui-rules.md, and @theme-rules.md to p
 ```
 
 
-10. `o1`
+15. `o1`
 ```
 We need to define the different tasks and features we'll need to complete in order to build our project.
 
@@ -128,19 +261,19 @@ Use @project-overview.md , @user-flow.md , @tech-stack.md , @tech-stack-rules.md
 ```
 
 
-11. `o1`
+16. `o1`
 ```
 Please also create a `phase-0-setup.md` file, which will be a checklist of the initial setup of the project, including installing dependencies, setting up dev tools, and configuring the environment.
 ```
 
 
-12. `o1` (OPTIONAL)
+17. `o1` (OPTIONAL)
 ```
 For each of the files attached, within each one, flatten its lists into a single list of actionable steps. Format each checklist item with "[ ]" to denote empty completions status. Also, follow the bracket with either "FRONTEND: " or "BACKEND: ", based on the nature of the task.
 ```
 
 
-13. USER ACTION: Make a brief Agent Rules document, which will be a list of rules for the agent to follow.
+18. USER ACTION: Make a brief Agent Rules document, which will be a list of rules for the agent to follow.
 ```
 # Rules for AI Agents
 
