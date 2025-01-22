@@ -50,7 +50,7 @@ Description: [Feature Description]
 
 ### Implementation Phase
 - [ ] Setup
-  - [ ] Verify layout in Next.js App Router
+  - [ ] Verify layout in Vite + React Router
   - [ ] Check shared states (Zustand)
 - Notes: [ Notes ]
 

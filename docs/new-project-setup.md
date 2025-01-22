@@ -13,7 +13,7 @@
    - Clarify how users will interact with the application (registration, navigation, messaging flows).
 
 5. @technical-requirements.md
-   - Generate comprehensive overview of the data models, core functionality, authorization, and real-time requirements needed to fulfill the user stories and features we’ve outlined.
+   - Generate comprehensive overview of the data models, core functionality, authorization, and real-time requirements needed to fulfill the user stories and features we've outlined.
 
 6. @data-model.md
    - Break down the data models and relationships needed for our project.
@@ -25,13 +25,13 @@
    - Break down the important considerations for our project.
 
 9.  @system-architecture.md
-   - Provide segmented overview of our project’s system architecture, including api routes. 
+   - Provide segmented overview of our project's system architecture, including api routes. 
 
 10. @product-requirements.md
    - Create actionable and implementation-ready set of requirements for our project.
 
 11. @tech-stack.md
-   - Describe the core technologies used (Node, Next.js, TypeScript, etc.) and their roles.
+   - Describe the core technologies used (Node, Vite, React, TypeScript, etc.) and their roles.
 
 12. @tech-stack-rules.md
    - Lay out best practices, limitations, and conventions for using the selected technologies.
@@ -43,7 +43,7 @@
    - Establish theming foundations (colors, typography, animations) to be incorporated into UI development.
 
 15. @codebase-best-practices.md  
-   - Outline folder structure, file naming conventions, and Next.js App Router practices.
+   - Outline folder structure, file naming conventions, and Vite + React best practices.
 
 16. ./checklists/
    - Outline the different phases of the project, and the different tasks and features we'll need to complete in order to complete our goal. Each feature (or group of features) should have its own phase document.
@@ -121,15 +121,7 @@ Frame your response as:
 - Data Models with fields and relationships
 - Core functionality requirements
 - Other considerations
-   - Authorization requirements with supabase built-in auth
-      - Consider a single, top-layer Auth provider
-   - Realtime requirements with supabase built-in functionality
-      - Consider realtime subscription requirements to avoid frequent reloads and latency issues, which can be caused by realtime data modifications triggering notifications to all subscribed clients
-      - Consider partial updates over full refetch, where appropriate
-   - Storage requirements with supabase built-in storage
-   - State management requirements
-   - Well architected and well named tables and relations in the database
-   - Code modularity and reusability
+   - reference @known-issues.md for any known issues and important considerations.
 
 Provide the file in markdown format. 
 ```
