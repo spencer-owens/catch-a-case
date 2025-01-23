@@ -4,7 +4,7 @@
    - Establish overall project purpose, scope, and goals.
 
 2. @user-stories.md
-   - Break down the user stories for each user type (customers, agents, admins, unauthenticated users).
+   - Break down the user stories for each user type. 
 
 3. @project-map.md
    - Generate site map 
@@ -62,11 +62,7 @@
 
 1. `o1`
 ```
-Use @project-overview.md to create a document called `user-stories.md`. This document should consider four types of users:
-Customers
-Agents (employees)
-Admins
-Unauthenticated Users
+Use @project-overview.md to create a document called `user-stories.md`. This should be a comprehensive breakdown of the different user types and their needs for our project.
 
 Think step by step about these four user types and their needs. For each role:
 
@@ -80,9 +76,9 @@ What they need to accomplish
 Why they need it
 How they'll interact with the system
 
-Output the user stories by role in a numbered list. 
+Output the user stories by role in a numbered list. Use as many sotries as you need to cover all the features we've outlined in the project overview.
 
-Provide the file in markdown format.
+Provide the file in markdown format. Output to the /project-info folder.
 ```
 
 
@@ -90,9 +86,9 @@ Provide the file in markdown format.
 ```
 Use @project-overview.md and @user-stories.md to create a document called `project-map.md`, which should be a high-level website map (site structure).
 
-It should be organized by user type (unauthenticated visitors, customers, agents, and admins), with each section linking back to features described in the specs. Make this thorough and exhaustive so it can be a reliable reference for other parts of the build process.
+It should be organized by user type, with each section linking back to features described in the specs. Make this thorough and exhaustive so it can be a reliable reference for other parts of the build process.
 
-Provide the file in markdown format.
+Provide the file in markdown format. Output to the /project-info folder.
 ```
 
 
@@ -102,7 +98,7 @@ Use @project-overview, @user-stories.md, and @project-map.md to create a documen
 
 The user journey should take into account the different features the app has & how they are connected to one-another. This document will later serve as a guide for building out our project architecture and UI elements.
 
-Provide the file in markdown format.
+Provide the file in markdown format. Output to the /project-info folder.
 ```
 
 
@@ -123,22 +119,26 @@ Frame your response as:
 - Other considerations
    - reference @known-issues.md for any known issues and important considerations.
 
-Provide the file in markdown format. 
+Provide the file in markdown format. Output to the /project-info folder.
 ```
 
 
 5. `claude` agent
 ```
-breakdown @technical-requirements into three additional documents:
+Break down @technical-requirements into four additional documents:
+
 `data-model.md`
+`routing-requirements.md`
 `core-functionality.md`
 `important-considerations.md`
+
+Output these files to the /project-info folder.
 ```
 
 
 6. `o1` 
 ```
-Use @data-model.md, @core-functionality.md, and @important-considerations.md to create a document called `system-architecture.md` for our zendesk clone app. Think step by step about:
+Use @data-model.md, @routing-requirements.md, @core-functionality.md, and @important-considerations.md to create a document called `system-architecture.md` for our app. Think step by step about:
 
 1. Define API endpoints needed for each data model
 2. Plan the component hierarchy and page structure
@@ -151,13 +151,13 @@ Frame your response as:
 
 Number each item and use single, clear sentences. Focus on what we need for implementation. 
 
-Provide the file in markdown format. 
+Provide the file in markdown format. Output to the /project-info folder.
 ```
 
 
 7. `o1`
 ```
-Use @system-architecture.md, @data-model.md, @core-functionality.md, and @important-considerations.md to create a document called `product-requirements.md`. This should provide a roadmap for delivering our project efficiently.
+Use @system-architecture.md, @data-model.md, @core-functionality.md, @routing-requirements.md, and @important-considerations.md to create a document called `product-requirements.md`. This should provide a roadmap for delivering our project efficiently.
 
 Structure our PRD as follows:
 
@@ -171,22 +171,21 @@ Components to be used
 
 Keep each point actionable and implementation-ready. Use clear, direct language with no fluff. but be exhaustive and include everything we will need. 
 
-Provide the file in markdown format. 
+Provide the file in markdown format. Output to the /project-info folder.
 ```
 
 
 8. `o1` NOTE: if you have any stack preferences, mention them here. It will make a much better plan that way.
 ```
-Use  @project-overview.md , @project-map.md , and @user-flow.md to make recommendations for our stack. I already know I want to use: 
+Use  @project-overview.md, @project-map.md , and @system-architecture.md, @technical-requirements, and @product-requirements to make recommendations for our stack. I already know I want to use: 
 
 Frontend: TypeScript, Vite/React, Tailwind, Shadcn
-Backend: postgres on Supabase for the backend 
-Other Supabase features: Realtime, Auth, Storage, pgvector,
-AI endpoint: Langchain and fastapi
+Backend: Supabase
+Other Supabase features: Realtime, Auth, Storage
 
 For each anticipated part of our stack, propose and describe an industry standard and a popular alternative, as well as a list of 1 or more other options. We will work through the list together to determine what we'll use for the project.
 
-Put this in a markdown file called `tech-stack-options.md`.
+Put this in a markdown file called `tech-stack-options.md`. Output to the /project-info folder.
 ```
 
 
@@ -202,7 +201,7 @@ Use @tech-stack.md to create a document called `tech-stack-rules.md`.
 This file should cover all best-practices, limitations, and conventions for using the selected technologies.
 It should be thorough, and include important considerations and common pitfalls for each technology.
 
-Provide the file in markdown format.
+Provide the file in markdown format. Output to the /rules folder.
 ```
 
 
@@ -220,7 +219,9 @@ I want my project to be ____ (mobile-first, responsive, animated, etc). We need 
 
 Also, I have decided I want my theme to be ____ (minimalist, retro, futuristic, glassmorphic, etc).
 
-Use @user-flow.md, @tech-stack.md, and @tech-stack-rules.md to put together two new files, called `ui-rules.md` and `theme-rules.md`.
+Use @technical-requirements, @product-requirements, @tech-stack.md, and @tech-stack-rules.md to put together two new files, called `ui-rules.md` and `theme-rules.md`.
+
+Output these files to the /rules folder.
 ```
 
 
@@ -232,7 +233,9 @@ We are building an AI-first codebase, which means it needs to be modular, scalab
 All files should have an explanation of their contents at the top, and all functions should have proper commentation of their purpose and parameters (JSDoc, TSDoc, etc, whatever is appropriate).
 To maintain readability by Cursor's AI tools, files should not exceed 250 lines.
 
-Use @tech-stack.md, @tech-stack-rules.md, @ui-rules.md, and @theme-rules.md to put together a new file called `codebase-best-practices.md`. This document should also include a file tree demonstrating the proper separation of concerns given our project's expected structure.
+Use @product-requirements.md, @data-model.md, @routing-requirements.md, @core_functionality.md, important-considerations.md, @tech-stack.md, @tech-stack-rules.md, @ui-rules.md, and @theme-rules.md to put together a new file called `codebase-best-practices.md`. This document should also include a file tree demonstrating the proper separation of concerns given our project's expected structure.
+
+Output this file to the /rules folder.
 ```
 
 
@@ -242,14 +245,13 @@ We need to define the different tasks and features we'll need to complete in ord
 
 Create a phased approach to building the application, and define the different tasks and features we'll need to complete in order to complete our goal.
 
-Rules to follow:
-- Each phase should have its own document
-- Each phase should be specific to a feature, or a group of closely-related features
-- Each feature should have a checklist of actionable steps, clearly specifying which steps are frontend and which are backend (frontend first, backend second)
-- Some tasks will be more complex than others, and will require more steps to complete. Don't be afraid to break down a task into multiple steps-- the checklist can be as long as you want.
-- Create as many phases as you deem appropriate, as long as they are specific.
+Use @project-overview.md , @product-requirements.md , @data-model.md , @routing-requirements.md , @core-functionality.md , @important-considerations.md , @tech-stack.md , @tech-stack-rules.md , @ui-rules.md , @theme-rules.md , and @codebase-best-practices.md to put together each of these new files.
 
-Use @project-overview.md , @user-flow.md , @tech-stack.md , @tech-stack-rules.md , @ui-rules.md , @theme-rules.md , and @codebase-best-practices.md to put together each of these new files.
+Consult @phase-creation-guide.me for guidance on how to structure these files. Follow these rules religiously.
+
+Start with a `phase-0-setup.md` file, which will be a checklist of the initial setup of the project, including installing dependencies, setting up dev tools, configuring the environment, and running the dev server.
+
+Output these files to the /checklists folder.
 ```
 
 

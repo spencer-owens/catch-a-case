@@ -24,6 +24,8 @@
    - Break complex tasks into multiple sequential tasks
    - Each task should have clear success criteria
    - Use clear numbering (1.1, 1.2, etc.) instead of nesting
+   - Clearly label tasks as frontend or backend
+   - Don't hesitate to create long checklists for complex features
 
 5. **Component-Driven Development**
    - Create UI components before or alongside feature implementation
@@ -44,10 +46,12 @@
    - Document any external service dependencies
 
 8. **Phase Organization Best Practices**
-   - Group related tasks into cohesive phases
-   - Keep phases focused on one major feature or system aspect
+   - Create a separate document for each phase
+   - Focus each phase on a specific feature or closely-related feature group
    - Include setup and cleanup tasks in each phase
    - Document phase completion criteria
+   - Create as many phases as needed to maintain specificity
+   - Break down complex features into multiple phases if necessary
 
 ## Implementation Order Guidelines
 
@@ -82,6 +86,7 @@
    - Tasks should be completable in one prompt
    - Break down complex features into smaller steps
    - Avoid tasks with many decision points
+   - Don't combine frontend and backend tasks
 
 2. **Missing Dependencies**
    - Ensure all required components exist
@@ -97,6 +102,12 @@
    - Include testing in task estimates
    - Define test scenarios upfront
    - Consider edge cases and error states
+
+5. **Phase Organization Issues**
+   - Mixing unrelated features in one phase
+   - Creating overly broad phases
+   - Not separating frontend and backend concerns
+   - Insufficient task breakdown
 
 ## Task Template
 
@@ -122,4 +133,4 @@
 - Happy path scenario
 - Error/edge case
 - Validation test
-``` 
+```
