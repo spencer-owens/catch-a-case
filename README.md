@@ -1,22 +1,50 @@
-# Project Setup Guide
+# React + TypeScript + Vite
 
-This repository contains a structured approach for building a new Vite + React application (code-named "AutoCRM"). It follows a series of documents that guide you through project context, user flows, technology stack choices, and best practices before outlining a phased approach to development.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
----
+Currently, two official plugins are available:
 
-## How @new-project-setup.md Works
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-The file [@new-project-setup.md](./docs/new-project-setup.md) provides a detailed sequence of steps and prompts, starting from a simple project overview and ending with a fully organized, phased approach to building the application. This file helps you:
+## Expanding the ESLint configuration
 
-1. Understand the overall goals and scope of the project (via the initial "Project Overview").  
-2. Incrementally build supporting documents (user flow, tech stack decisions, UI/theme rules, etc.).  
-3. Embody best practices in folder structure, coding style, checklist-based development, and environment setup.  
-4. Follow a clearly defined, phase-by-phase plan for implementing each feature set in both frontend and backend contexts.
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-By reading and following each step in @new-project-setup.md, you'll quickly bootstrap a robust environment for AutoCRM, ensuring all participants or contributors operate with the same architectural understanding, coding guidelines, and clear objectives.
+- Configure the top-level `parserOptions` property like this:
 
----
+```js
+export default tseslint.config({
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
 
-If you have any questions or want to expand upon a particular feature or workflow, consult the corresponding doc under /docs for further context and instructions.
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Optionally add `...tseslint.configs.stylisticTypeChecked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
 
-Happy building!
+```js
+// eslint.config.js
+import react from 'eslint-plugin-react'
+
+export default tseslint.config({
+  // Set the react version
+  settings: { react: { version: '18.3' } },
+  plugins: {
+    // Add the react plugin
+    react,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended rules
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+  },
+})
+```

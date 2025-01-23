@@ -23,5 +23,5 @@
 
 ## Test Cases
 - Happy path: Client uploads an attachment, agent sees it in the case detail; client leaves feedback upon closure, agent can view rating  
-- Error/edge case: Attempting to upload or delete an attachment in a case that the user doesn't own is blocked by RLS 
+- Error/edge case: Attempting to upload or delete an attachment in a case that the user doesn’t own is blocked by RLS 
 - Validation test: Confirm file references in the DB match actual storage in Supabase 

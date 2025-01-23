@@ -10,9 +10,9 @@
 1. [ ] BACKEND: Create "Users" table (id, email, password_hash, role, full_name, created_at, updated_at)  
 2. [ ] BACKEND: Create "Teams" table + join table (team_members) referencing Users  
 3. [ ] BACKEND: Create "Cases" table referencing Users (client_id, assigned_agent_id), plus fields for status, title, and description  
-4. [ ] BACKEND: Create "Statuses" (optional table if dynamic), "Tags" + join table (cases_tags), "Custom Fields" table, "Internal Notes," "Messages," "Attachments," and "Feedback" as specified in @data-model.md  
+4. [ ] BACKEND: Create "Statuses" (dynamic), "Tags" + join table (cases_tags), "Custom Fields" table, "Internal Notes," "Messages," "Attachments," and "Feedback" as specified in @data-model.md  
 5. [ ] BACKEND: Apply any indexing or constraints for performance (e.g., unique indexes on email or tag_name)  
-6. [ ] BACKEND: Enable Row Level Security (RLS) in Supabase (or PostgreSQL) for each table, ensuring only owners or assigned roles can access data  
+6. [ ] BACKEND: Enable basic Row Level Security (RLS) in Supabase (or PostgreSQL) for each table, ensuring only owners or assigned roles can access data  
 7. [ ] BACKEND: Generate sample migrations or SQL scripts to recreate the schema consistently  
 8. [ ] BACKEND: Load realistic test data (Clients, Agents, Admins, sample Cases, etc.) to validate relationships
 

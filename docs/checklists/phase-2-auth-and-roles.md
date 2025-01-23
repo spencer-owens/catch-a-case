@@ -9,9 +9,9 @@
 ## Steps
 1. [ ] BACKEND: Configure Supabase Auth for email/password signups, or set up custom token handling  
 2. [ ] BACKEND: Write or refine RLS policies to align with user roles (client, agent, admin)  
-3. [ ] FRONTEND: Build a "Register" page or component for new user signups (optional if Admin only can create accounts)  
+3. [ ] FRONTEND: Build a "Register" page or component for new user signups 
 4. [ ] FRONTEND: Create a "Login" page or modal that integrates with Supabase Auth's login endpoint  
-5. [ ] FRONTEND: Implement a global auth store (Zustand or React Context) storing the current user's token and role  
+5. [ ] FRONTEND: Implement a global auth store (React Context) storing the current user's token and role  
 6. [ ] FRONTEND: Add route guards or protected routes for agent/admin-only pages (e.g., admin dashboards, team management)  
 7. [ ] BACKEND: Validate that newly registered users appear correctly in the "Users" table with their assigned role  
 8. [ ] FRONTEND/BACKEND: Test user flows: register -> login -> restricted page access

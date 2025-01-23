@@ -51,7 +51,7 @@ Description: [Feature Description]
 ### Implementation Phase
 - [ ] Setup
   - [ ] Verify layout in Vite + React Router
-  - [ ] Check shared states (Zustand)
+  - [ ] Check shared states (React Context)
 - Notes: [ Notes ]
 
 - [ ] Development

@@ -232,7 +232,7 @@ Below are important considerations gathered from the Known Issues document and b
    - Handle file versioning or replacement as necessary.
 
 4. **State Management**  
-   - Rely on React (or similar) real-time data sync, local caching, or global state management to provide a smooth user experience.  
+   - Rely on React (React Context) real-time data sync, local caching, or global state management to provide a smooth user experience.  
    - Structure front-end state carefully to avoid inconsistencies.
 
 5. **Database Schema & Naming Conventions**  

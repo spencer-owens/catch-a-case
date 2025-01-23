@@ -9,7 +9,7 @@
 ## Steps
 1. [ ] BACKEND: Implement POST /cases/:caseId/messages and GET /cases/:caseId/messages endpoints for client-agent communication  
 2. [ ] FRONTEND: Build a messages UI on "Case Details" or a dedicated "Messaging" tab  
-3. [ ] BACKEND: Create a subscription channel in Supabase or websockets for new messages, if real-time updates are required  
+3. [ ] BACKEND: Create a subscription channel in Supabase Realtime for new messages 
 4. [ ] FRONTEND: Subscribe to the relevant message channel for live updates (agent sees new client messages instantly, and vice versa)  
 5. [ ] BACKEND: Implement POST /cases/:caseId/notes and GET /cases/:caseId/notes for agent-only internal notes  
 6. [ ] FRONTEND: Provide an "Internal Notes" section visible only to agents, ignoring for clients  
@@ -19,7 +19,7 @@
 - Real-time or near-real-time messaging between client and assigned agent is functional  
 - Internal notes remain hidden from clients  
 - Subscriptions or polling solutions ensure message updates appear without manual refresh  
-- RLS/permissions thoroughly enforced
+- RLS/permissions thoroughly handled
 
 ## Test Cases
 - Happy path: Client and agent exchange messages in real-time; agent sees and creates internal notes not visible to client  
