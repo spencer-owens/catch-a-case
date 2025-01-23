@@ -3,7 +3,7 @@
 ## Core Principles
 
 1. **Database First**
-   - Always implement database schema and tables before building features
+   - Implement database schema and tables before building features
    - This prevents architectural changes later and ensures data consistency
    - Include proper relationships, constraints, and indexes from the start
 
@@ -18,20 +18,18 @@
    - Each task should be completable by an agent in one prompt
    - Avoid tasks that require complex decision trees or multiple major decisions
    - Target 15-30 minutes of work per task for an agent
-
-4. **Flat Task Structure**
-   - Avoid nested subtasks
-   - Break complex tasks into multiple sequential tasks
-   - Each task should have clear success criteria
-   - Use clear numbering (1.1, 1.2, etc.) instead of nesting
-   - Clearly label tasks as frontend or backend
-   - Don't hesitate to create long checklists for complex features
-
-5. **Component-Driven Development**
+  
+4. **Component-Driven Development**
    - Create UI components before or alongside feature implementation
    - Include basic styling and responsiveness in component tasks
    - Ensure components are reusable and well-documented
    - Test components in isolation before integration
+
+5. **Task Structure**
+   - Break complex tasks into multiple sequential tasks
+   - Each task should have clear success criteria
+   - Clearly label tasks as frontend or backend
+   - Don't hesitate to create long checklists for complex features
 
 6. **Testing and Validation**
    - Include explicit testing tasks after each feature implementation
@@ -109,28 +107,3 @@
    - Not separating frontend and backend concerns
    - Insufficient task breakdown
 
-## Task Template
-
-```markdown
-### Task Title
-
-**Prerequisites:**
-- List required components/features
-- List required API endpoints
-- List required database tables
-
-**Steps:**
-1. Clear, atomic step
-2. Clear, atomic step
-3. Clear, atomic step
-
-**Success Criteria:**
-- Specific, measurable outcome
-- Testable condition
-- Observable result
-
-**Test Cases:**
-- Happy path scenario
-- Error/edge case
-- Validation test
-```

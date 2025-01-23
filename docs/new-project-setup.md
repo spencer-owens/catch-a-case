@@ -245,11 +245,17 @@ We need to define the different tasks and features we'll need to complete in ord
 
 Create a phased approach to building the application, and define the different tasks and features we'll need to complete in order to complete our goal.
 
-Use @project-overview.md , @product-requirements.md , @data-model.md , @routing-requirements.md , @core-functionality.md , @important-considerations.md , @tech-stack.md , @tech-stack-rules.md , @ui-rules.md , @theme-rules.md , and @codebase-best-practices.md to put together each of these new files.
+Consult @phase-creation-guide.me for guidance on how to create these files.
 
-Consult @phase-creation-guide.me for guidance on how to structure these files. Follow these rules religiously.
+These documents should follow these rules:
 
-Start with a `phase-0-setup.md` file, which will be a checklist of the initial setup of the project, including installing dependencies, setting up dev tools, configuring the environment, and running the dev server.
+- Each phase should have its own document
+- Each phase should be specific to a feature, or a group of closely-related features
+- Each feature should have a checklist of actionable steps, clearly specifying which steps are frontend and which are backend
+- Some tasks will be more complex than others, and will require more steps to complete. Don't be afraid to break down a task into multiple steps--the checklist can be as long as you want.
+- Create as many phases as you deem appropriate, as long as they are specific.
+
+Use @project-overview.md , @product-requirements.md , @data-model.md , @routing-requirements.md , @important-considerations.md , @tech-stack.md , @tech-stack-rules.md , and @codebase-best-practices.md to put together each of these new files.
 
 Output these files to the /checklists folder.
 ```
