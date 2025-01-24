@@ -27,8 +27,7 @@ Description: [Feature Description]
 ### Understanding Phase
 - [ ] Documentation Review
     - [ ] Tech stack guidelines (`tech-stack.md`, `tech-stack-rules.md`)
-    - [ ] Existing services and utils (`services.ts`, `database.ts`, `feature/*/utils`)
-    - [ ] Data models (`lib/types`)
+
     - [ ] Integration points (endpoints, auth boundaries)
     - [ ] Real-time features (presence, typing, notifications)
 - Notes: [ Notes ]
