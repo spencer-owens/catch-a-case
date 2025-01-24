@@ -5,6 +5,9 @@ import { LoginPage } from '@/pages/auth/login'
 import { SignUpPage } from '@/pages/auth/signup'
 import { AuthCallback } from '@/pages/auth/callback'
 import { DashboardPage } from '@/pages/dashboard'
+import { CreateCasePage } from '@/pages/cases/create'
+import { CaseDetailsPage } from '@/pages/cases/[id]'
+import { Toaster } from '@/components/ui/toaster'
 
 function App() {
   return (
@@ -22,6 +25,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/cases/create"
+            element={
+              <ProtectedRoute>
+                <CreateCasePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/cases/:id"
+            element={
+              <ProtectedRoute>
+                <CaseDetailsPage />
               </ProtectedRoute>
             }
           />
@@ -46,6 +67,7 @@ function App() {
             }
           />
         </Routes>
+        <Toaster />
       </AuthProvider>
     </Router>
   )

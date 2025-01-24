@@ -5,6 +5,7 @@ import { supabase } from '../supabase'
 type AuthContextType = {
   user: User | null
   session: Session | null
+  isAgent: boolean
   signUp: (email: string, password: string) => Promise<{ error: Error | null; requiresEmailConfirmation?: boolean }>
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
@@ -135,17 +136,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const value = {
+    user,
+    session,
+    isAgent: user?.user_metadata?.role === 'agent' || user?.user_metadata?.role === 'admin',
+    signUp,
+    signIn,
+    signOut,
+    loading,
+  }
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        signUp,
-        signIn,
-        signOut,
-        loading,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )
