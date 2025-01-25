@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/lib/context/auth-context'
 import { Button } from '@/components/ui/button'
@@ -7,13 +7,24 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
-export function LoginForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+interface LoginFormProps {
+  defaultEmail?: string
+  defaultPassword?: string
+}
+
+export function LoginForm({ defaultEmail, defaultPassword }: LoginFormProps) {
+  const [email, setEmail] = useState(defaultEmail || '')
+  const [password, setPassword] = useState(defaultPassword || '')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { signIn } = useAuth()
   const navigate = useNavigate()
+
+  // Update state when default values change
+  useEffect(() => {
+    if (defaultEmail) setEmail(defaultEmail)
+    if (defaultPassword) setPassword(defaultPassword)
+  }, [defaultEmail, defaultPassword])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

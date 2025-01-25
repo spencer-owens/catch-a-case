@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -11,6 +12,13 @@ import { toast } from '@/components/ui/use-toast'
 import { CaseStatusBadge } from "@/components/cases/case-status-badge"
 import { UpdateStatusDialog } from "@/components/cases/update-status-dialog"
 import { AssignAgentDialog } from "@/components/cases/assign-agent-dialog"
+import { MessageList } from "@/components/features/messages/MessageList"
+import { InternalNoteList } from "@/components/features/notes/InternalNoteList"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useMessages } from '@/lib/hooks/useMessages'
+import { useInternalNotes } from '@/lib/hooks/useInternalNotes'
+import { cn } from '@/lib/utils'
 
 interface CaseDetails {
   id: string
@@ -46,10 +54,71 @@ function CaseSkeleton() {
   )
 }
 
+function MessagePreview({ message, isAdmin }: { message: any, isAdmin: boolean }) {
+  const { user } = useAuth()
+  const isOwn = message.sender_id === user?.id
+  const isAgentMessage = message.sender_id === message.case_agent_id
+  const shouldUsePrimaryStyle = isOwn || (isAdmin && isAgentMessage)
+
+  return (
+    <div className="mt-4 mb-2">
+      <div
+        className={cn(
+          'rounded-lg p-3 w-full',
+          shouldUsePrimaryStyle
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted text-muted-foreground'
+        )}
+      >
+        <p className="text-sm whitespace-pre-wrap break-words line-clamp-2">
+          {message.message_content}
+        </p>
+        <span className="text-xs opacity-70 mt-1 block">
+          {new Date(message.created_at).toLocaleTimeString()}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function NotePreview({ note }: { note: any }) {
+  const { user } = useAuth()
+  const isOwn = note.agent_id === user?.id
+
+  return (
+    <div className="mt-4 mb-2">
+      <div
+        className={cn(
+          'rounded-lg p-3 w-full',
+          isOwn
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted text-muted-foreground'
+        )}
+      >
+        <p className="text-sm whitespace-pre-wrap break-words line-clamp-2">
+          {note.note_content}
+        </p>
+        <span className="text-xs opacity-70 mt-1 block">
+          {new Date(note.created_at).toLocaleTimeString()}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 export function CaseDetailsPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user, isAgent } = useAuth()
+  const isAdmin = user?.user_metadata?.role === 'admin'
+  const [isMessagesOpen, setIsMessagesOpen] = React.useState(true)
+  const [isNotesOpen, setIsNotesOpen] = React.useState(false)
+  const { messages } = useMessages(id!)
+  const { notes } = useInternalNotes(id!)
+
+  // Get most recent message and note
+  const latestMessage = messages?.[messages.length - 1]
+  const latestNote = notes?.[notes.length - 1]
 
   const { data, isLoading, error, refetch } = useQuery<CaseDetails>({
     queryKey: ["case", id],
@@ -73,11 +142,6 @@ export function CaseDetailsPage() {
       // Transform the nested arrays into objects
       if (!data) throw new Error('Case not found')
 
-      // Log the raw data to help debug
-      console.log('Raw case data:', data)
-      console.log('Raw client data:', data.client)
-      console.log('Raw status data:', data.status)
-
       // Handle the nested objects correctly
       const transformedData = {
         ...data,
@@ -88,9 +152,6 @@ export function CaseDetailsPage() {
           : data.assigned_agent || null,
         status: Array.isArray(data.status) ? data.status[0] : data.status,
       }
-
-      // Log the transformed data
-      console.log('Transformed case data:', transformedData)
 
       // Validate only the required fields
       if (!transformedData.id || !transformedData.title) {
@@ -200,17 +261,72 @@ export function CaseDetailsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Messages</CardTitle>
-            <Button size="sm">New Message</Button>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center text-muted-foreground">
-              No messages yet
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <Collapsible open={isMessagesOpen} onOpenChange={setIsMessagesOpen}>
+              <CardHeader className="pb-0">
+                <div className="flex items-center justify-between">
+                  <CardTitle>Messages</CardTitle>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      {isMessagesOpen ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
+                {!isMessagesOpen && latestMessage && (
+                  <div className="mt-2">
+                    <MessagePreview message={latestMessage} isAdmin={isAdmin} />
+                  </div>
+                )}
+              </CardHeader>
+              <CollapsibleContent>
+                <CardContent className="p-0">
+                  <MessageList caseId={data.id} />
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+
+          {isAgent && (
+            <Card>
+              <Collapsible open={isNotesOpen} onOpenChange={setIsNotesOpen}>
+                <CardHeader className="pb-0">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Internal Notes</CardTitle>
+                      <CardDescription>
+                        Notes visible only to agents and admins
+                      </CardDescription>
+                    </div>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        {isNotesOpen ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
+                  {!isNotesOpen && latestNote && (
+                    <div className="mt-2">
+                      <NotePreview note={latestNote} />
+                    </div>
+                  )}
+                </CardHeader>
+                <CollapsibleContent>
+                  <CardContent className="p-0">
+                    <InternalNoteList caseId={data.id} />
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   )

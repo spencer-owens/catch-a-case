@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuth } from '@/lib/context/auth-context'
 import { supabase } from '@/lib/supabase'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -21,6 +22,7 @@ type CreateCaseForm = z.infer<typeof createCaseSchema>
 export function CreateCasePage() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const queryClient = useQueryClient()
 
   const form = useForm<CreateCaseForm>({
     resolver: zodResolver(createCaseSchema),
@@ -30,8 +32,8 @@ export function CreateCasePage() {
     },
   })
 
-  async function onSubmit(data: CreateCaseForm) {
-    try {
+  const createCaseMutation = useMutation({
+    mutationFn: async (data: CreateCaseForm) => {
       // First, get the 'Intake' status ID
       const { data: statusData, error: statusError } = await supabase
         .from('statuses')
@@ -42,7 +44,7 @@ export function CreateCasePage() {
       if (statusError) throw statusError
 
       // Then create the case with the status ID
-      const { error: caseError } = await supabase
+      const { data: newCase, error: caseError } = await supabase
         .from('cases')
         .insert({
           title: data.title,
@@ -54,21 +56,31 @@ export function CreateCasePage() {
         .single()
 
       if (caseError) throw caseError
-
+      return newCase
+    },
+    onSuccess: () => {
+      // Invalidate the cases query to trigger a refetch
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      
       toast({
         title: 'Case Created',
         description: 'Your case has been successfully created.',
       })
 
       navigate('/dashboard')
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error('Error creating case:', error)
       toast({
         title: 'Error',
         description: 'There was an error creating your case. Please try again.',
         variant: 'destructive',
       })
-    }
+    },
+  })
+
+  function onSubmit(data: CreateCaseForm) {
+    createCaseMutation.mutate(data)
   }
 
   return (
@@ -123,7 +135,12 @@ export function CreateCasePage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Create Case</Button>
+                <Button 
+                  type="submit"
+                  disabled={createCaseMutation.isPending}
+                >
+                  {createCaseMutation.isPending ? 'Creating...' : 'Create Case'}
+                </Button>
               </div>
             </form>
           </Form>
