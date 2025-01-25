@@ -17,6 +17,9 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useMessages } from '@/lib/hooks/useMessages'
 import { useInternalNotes } from '@/lib/hooks/useInternalNotes'
 import { cn } from '@/lib/utils'
+import { AttachmentList } from "@/components/features/attachments/AttachmentList"
+import { FeedbackDialog } from "@/components/features/feedback/FeedbackDialog"
+import { FeedbackForm } from "@/components/features/feedback/FeedbackForm"
 
 interface CaseDetails {
   id: string
@@ -111,12 +114,9 @@ export function CaseDetailsPage() {
   const isAdmin = user?.user_metadata?.role === 'admin'
   const [isMessagesOpen, setIsMessagesOpen] = React.useState(true)
   const [isNotesOpen, setIsNotesOpen] = React.useState(false)
+  const [showFeedbackDialog, setShowFeedbackDialog] = React.useState(false)
   const { messages } = useMessages(id!)
   const { notes } = useInternalNotes(id!)
-
-  // Get most recent message and note
-  const latestMessage = messages?.[messages.length - 1]
-  const latestNote = notes?.[notes.length - 1]
 
   const { data, isLoading, error, refetch } = useQuery<CaseDetails>({
     queryKey: ["case", id],
@@ -172,6 +172,13 @@ export function CaseDetailsPage() {
     retry: false, // Don't retry on error
   })
 
+  // Show feedback dialog when case is marked as closed
+  React.useEffect(() => {
+    if (data?.status.status_name === 'Closed' && !isAgent) {
+      setShowFeedbackDialog(true)
+    }
+  }, [data?.status.status_name, isAgent])
+
   if (isLoading) {
     return (
       <div className="container py-6">
@@ -202,6 +209,9 @@ export function CaseDetailsPage() {
       </div>
     )
   }
+
+  const isClient = user?.id === data.client.id
+  const isClosed = data.status.status_name === 'Closed'
 
   return (
     <div className="container py-6">
@@ -251,7 +261,7 @@ export function CaseDetailsPage() {
                   />
                 ) : (
                   <p className="text-muted-foreground">
-                    {data.assigned_agent?.email || "Not assigned"}
+                    {data.assigned_agent?.email || 'No agent assigned'}
                   </p>
                 )}
               </div>
@@ -259,73 +269,94 @@ export function CaseDetailsPage() {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
-          <Card>
-            <Collapsible open={isMessagesOpen} onOpenChange={setIsMessagesOpen}>
-              <CardHeader className="pb-0">
-                <div className="flex items-center justify-between">
-                  <CardTitle>Messages</CardTitle>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      {isMessagesOpen ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </CollapsibleTrigger>
-                </div>
-                {!isMessagesOpen && latestMessage && (
-                  <div className="mt-2">
-                    <MessagePreview message={latestMessage} isAdmin={isAdmin} />
-                  </div>
-                )}
-              </CardHeader>
-              <CollapsibleContent>
-                <CardContent className="p-0">
-                  <MessageList caseId={data.id} />
-                </CardContent>
-              </CollapsibleContent>
-            </Collapsible>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Files & Attachments</CardTitle>
+            <CardDescription>
+              Upload and manage case-related documents
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AttachmentList caseId={data.id} />
+          </CardContent>
+        </Card>
 
-          {isAgent && (
-            <Card>
-              <Collapsible open={isNotesOpen} onOpenChange={setIsNotesOpen}>
-                <CardHeader className="pb-0">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Internal Notes</CardTitle>
-                      <CardDescription>
-                        Notes visible only to agents and admins
-                      </CardDescription>
-                    </div>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        {isNotesOpen ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                  {!isNotesOpen && latestNote && (
-                    <div className="mt-2">
-                      <NotePreview note={latestNote} />
-                    </div>
-                  )}
-                </CardHeader>
-                <CollapsibleContent>
-                  <CardContent className="p-0">
-                    <InternalNoteList caseId={data.id} />
-                  </CardContent>
-                </CollapsibleContent>
-              </Collapsible>
-            </Card>
-          )}
-        </div>
+        {isClient && isClosed && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Feedback</CardTitle>
+              <CardDescription>
+                Share your experience with our service
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FeedbackForm caseId={data.id} />
+            </CardContent>
+          </Card>
+        )}
       </div>
+
+      <div className="mt-6 space-y-6">
+        <Collapsible
+          open={isMessagesOpen}
+          onOpenChange={setIsMessagesOpen}
+          className="space-y-2"
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Messages</h2>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm">
+                {isMessagesOpen ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <Card>
+              <CardContent className="p-4">
+                <MessageList caseId={data.id} />
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {isAgent && (
+          <Collapsible
+            open={isNotesOpen}
+            onOpenChange={setIsNotesOpen}
+            className="space-y-2"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Internal Notes</h2>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  {isNotesOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+            <CollapsibleContent>
+              <Card>
+                <CardContent className="p-4">
+                  <InternalNoteList caseId={data.id} />
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+      </div>
+
+      <FeedbackDialog
+        caseId={data.id}
+        isOpen={showFeedbackDialog}
+        onOpenChange={setShowFeedbackDialog}
+      />
     </div>
   )
 } 
