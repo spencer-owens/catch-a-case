@@ -1,6 +1,9 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '../supabase'
+import { LoadingScreen } from '@/components/ui/loading-screen'
+import { Button } from '@/components/ui/button'
+import { getCachedRole, setCachedRole, updateUserWithRole } from '../utils/auth-helpers'
 
 type AuthContextType = {
   user: User | null
@@ -10,6 +13,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
   loading: boolean
+  error: Error | null
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -18,9 +22,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  const initializationComplete = useRef(false)
 
   // Function to fetch user role from public.users
-  const fetchAndUpdateUserRole = async (currentUser: User) => {
+  const fetchAndUpdateUserRole = useCallback(async (currentUser: User): Promise<User> => {
+    console.log('🔍 Fetching role for:', currentUser.email)
+    
+    // Check cache first
+    const cachedRole = getCachedRole(currentUser.id)
+    if (cachedRole) {
+      console.log('📦 Using cached role:', cachedRole)
+      return updateUserWithRole(currentUser, cachedRole)
+    }
+
     try {
       const { data: userData, error } = await supabase
         .from('users')
@@ -28,54 +43,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', currentUser.id)
         .single()
 
-      if (error) {
-        console.error('Error fetching user role:', error)
-        return currentUser
-      }
+      if (error) throw error
 
-      // Update user metadata with the role from public.users
-      return {
-        ...currentUser,
-        user_metadata: {
-          ...currentUser.user_metadata,
-          role: userData.role
-        }
-      }
+      const role = userData.role
+      console.log('✅ Fetched role:', role)
+      
+      // Cache the role
+      setCachedRole(currentUser.id, role)
+      
+      return updateUserWithRole(currentUser, role)
     } catch (err) {
-      console.error('Unexpected error fetching user role:', err)
+      console.error('❌ Error fetching role:', err)
+      // Return user with existing metadata if we can't fetch role
       return currentUser
     }
-  }
+  }, [])
+
+  // Function to update auth state
+  const updateAuthState = useCallback(async (session: Session | null) => {
+    try {
+      if (session?.user) {
+        const userWithRole = await fetchAndUpdateUserRole(session.user)
+        setSession(session)
+        setUser(userWithRole)
+      } else {
+        setSession(null)
+        setUser(null)
+      }
+    } catch (err) {
+      console.error('Error updating auth state:', err)
+      setError(err instanceof Error ? err : new Error('Failed to update auth state'))
+    } finally {
+      setLoading(false)
+    }
+  }, [fetchAndUpdateUserRole])
 
   useEffect(() => {
+    let mounted = true
+    
     // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session)
-      if (session?.user) {
-        const userWithRole = await fetchAndUpdateUserRole(session.user)
-        setUser(userWithRole)
-      } else {
-        setUser(null)
+    const initializeAuth = async () => {
+      // Skip if already initialized
+      if (initializationComplete.current) return
+      
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) throw sessionError
+        if (mounted) {
+          await updateAuthState(session)
+          initializationComplete.current = true
+        }
+      } catch (err) {
+        console.error('Auth initialization error:', err)
+        if (mounted) {
+          setError(err instanceof Error ? err : new Error('Failed to initialize auth'))
+          setLoading(false)
+        }
       }
-      setLoading(false)
-    })
+    }
+
+    initializeAuth()
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session)
-      if (session?.user) {
-        const userWithRole = await fetchAndUpdateUserRole(session.user)
-        setUser(userWithRole)
-      } else {
-        setUser(null)
-      }
-      setLoading(false)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return
+      await updateAuthState(session)
     })
 
-    return () => subscription.unsubscribe()
-  }, [])
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [updateAuthState])
 
   const signUp = async (email: string, password: string) => {
     try {
@@ -144,6 +184,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signOut,
     loading,
+    error,
+  }
+
+  console.log('🎭 Auth Provider state:', { loading, error: error?.message, user: user?.email })
+
+  if (loading) {
+    return <LoadingScreen />
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <p className="text-destructive">Failed to initialize authentication</p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
