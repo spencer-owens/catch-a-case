@@ -13,7 +13,7 @@ interface MessageListProps {
 
 export function MessageList({ caseId, className }: MessageListProps) {
   const { messages, sendMessage } = useMessages(caseId)
-  const { user, isAgent } = useAuth()
+  const { user } = useAuth()
   const isAdmin = user?.user_metadata?.role === 'admin'
   const [content, setContent] = React.useState('')
   const [isSending, setIsSending] = React.useState(false)

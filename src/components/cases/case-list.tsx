@@ -86,7 +86,11 @@ export function CaseList({ userId, role }: CaseListProps) {
       const { data, error } = await query
 
       if (error) throw error
-      return data as Case[]
+      return data?.map(item => ({
+        ...item,
+        status: Array.isArray(item.status) ? item.status[0] : item.status,
+        assigned_agent: Array.isArray(item.assigned_agent) ? item.assigned_agent[0] : item.assigned_agent
+      })) as Case[]
     },
   })
 

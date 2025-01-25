@@ -18,7 +18,7 @@ export function useInternalNotes(caseId: string) {
   const [newNotes, setNewNotes] = useState<InternalNote[]>([])
 
   // Fetch initial notes
-  const { data: notes = [], refetch } = useQuery({
+  const { data: notes = [] } = useQuery({
     queryKey: ['internal_notes', caseId],
     queryFn: async () => {
       const { data, error } = await supabase

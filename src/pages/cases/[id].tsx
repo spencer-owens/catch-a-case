@@ -6,9 +6,7 @@ import { useAuth } from '@/lib/context/auth-context'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { toast } from '@/components/ui/use-toast'
 import { CaseStatusBadge } from "@/components/cases/case-status-badge"
 import { UpdateStatusDialog } from "@/components/cases/update-status-dialog"
 import { AssignAgentDialog } from "@/components/cases/assign-agent-dialog"

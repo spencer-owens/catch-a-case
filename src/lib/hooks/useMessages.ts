@@ -19,7 +19,7 @@ export function useMessages(caseId: string) {
   const [newMessages, setNewMessages] = useState<Message[]>([])
 
   // Fetch initial messages
-  const { data: messages = [], refetch } = useQuery({
+  const { data: messages = [] } = useQuery({
     queryKey: ['messages', caseId],
     queryFn: async () => {
       const { data, error } = await supabase
