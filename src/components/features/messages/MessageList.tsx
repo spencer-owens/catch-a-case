@@ -63,7 +63,7 @@ export function MessageList({ caseId, className }: MessageListProps) {
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
-      <form onSubmit={handleSend} className="p-4 border-t">
+      <form onSubmit={handleSend} className="p-4 border-t space-y-4">
         <div className="flex gap-2">
           <Textarea
             value={content}
