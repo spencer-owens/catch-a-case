@@ -16,9 +16,9 @@ export function useFeedback(caseId: string) {
         .from('feedback')
         .select('*')
         .eq('case_id', caseId)
-        .single()
+        .maybeSingle()
 
-      if (error && error.code !== 'PGRST116') throw error // PGRST116 is "no rows returned"
+      if (error) throw error
       return data
     },
   })

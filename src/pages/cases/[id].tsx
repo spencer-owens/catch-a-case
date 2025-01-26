@@ -14,9 +14,6 @@ import { MessageList } from "@/components/features/messages/MessageList"
 import { InternalNoteList } from "@/components/features/notes/InternalNoteList"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { useMessages } from '@/lib/hooks/useMessages'
-import { useInternalNotes } from '@/lib/hooks/useInternalNotes'
-import { cn } from '@/lib/utils'
 import { AttachmentList } from "@/components/features/attachments/AttachmentList"
 import { FeedbackDialog } from "@/components/features/feedback/FeedbackDialog"
 import { FeedbackForm } from "@/components/features/feedback/FeedbackForm"
@@ -55,70 +52,15 @@ function CaseSkeleton() {
   )
 }
 
-function MessagePreview({ message, isAdmin }: { message: any, isAdmin: boolean }) {
-  const { user } = useAuth()
-  const isOwn = message.sender_id === user?.id
-  const isAgentMessage = message.sender_id === message.case_agent_id
-  const shouldUsePrimaryStyle = isOwn || (isAdmin && isAgentMessage)
-
-  return (
-    <div className="mt-4 mb-2">
-      <div
-        className={cn(
-          'rounded-lg p-3 w-full',
-          shouldUsePrimaryStyle
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-muted text-muted-foreground'
-        )}
-      >
-        <p className="text-sm whitespace-pre-wrap break-words line-clamp-2">
-          {message.message_content}
-        </p>
-        <span className="text-xs opacity-70 mt-1 block">
-          {new Date(message.created_at).toLocaleTimeString()}
-        </span>
-      </div>
-    </div>
-  )
-}
-
-function NotePreview({ note }: { note: any }) {
-  const { user } = useAuth()
-  const isOwn = note.agent_id === user?.id
-
-  return (
-    <div className="mt-4 mb-2">
-      <div
-        className={cn(
-          'rounded-lg p-3 w-full',
-          isOwn
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-muted text-muted-foreground'
-        )}
-      >
-        <p className="text-sm whitespace-pre-wrap break-words line-clamp-2">
-          {note.note_content}
-        </p>
-        <span className="text-xs opacity-70 mt-1 block">
-          {new Date(note.created_at).toLocaleTimeString()}
-        </span>
-      </div>
-    </div>
-  )
-}
-
 export function CaseDetailsPage() {
   const { id } = useParams()
+  const { user } = useAuth()
   const navigate = useNavigate()
-  const { user, isAgent } = useAuth()
-  const isAdmin = user?.user_metadata?.role === 'admin'
   const [isMessagesOpen, setIsMessagesOpen] = React.useState(true)
   const [isNotesOpen, setIsNotesOpen] = React.useState(false)
   const [showFeedbackDialog, setShowFeedbackDialog] = React.useState(false)
-  const { messages } = useMessages(id!)
-  const { notes } = useInternalNotes(id!)
-
-  const { data, isLoading, error, refetch } = useQuery<CaseDetails>({
+  
+  const { data: caseDetails, isLoading, refetch } = useQuery<CaseDetails>({
     queryKey: ["case", id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -172,12 +114,13 @@ export function CaseDetailsPage() {
     retry: false, // Don't retry on error
   })
 
-  // Show feedback dialog when case is marked as closed
+  // Show feedback dialog when case is closed
   React.useEffect(() => {
-    if (data?.status.status_name === 'Closed' && !isAgent) {
+    if (!caseDetails) return
+    if (caseDetails.status.status_name === 'Closed' && !caseDetails.assigned_agent) {
       setShowFeedbackDialog(true)
     }
-  }, [data?.status.status_name, isAgent])
+  }, [caseDetails])
 
   if (isLoading) {
     return (
@@ -187,15 +130,13 @@ export function CaseDetailsPage() {
     )
   }
 
-  if (error || !data) {
+  if (!caseDetails) {
     return (
       <div className="container py-6">
         <Card>
           <CardContent className="py-8 text-center">
             <p className="text-muted-foreground">
-              {error instanceof Error 
-                ? error.message 
-                : 'Error loading case details. The case may not exist or you may not have permission to view it.'}
+              Error loading case details. The case may not exist or you may not have permission to view it.
             </p>
             <Button
               variant="outline"
@@ -210,15 +151,15 @@ export function CaseDetailsPage() {
     )
   }
 
-  const isClient = user?.id === data.client.id
-  const isClosed = data.status.status_name === 'Closed'
+  const isClient = user?.id === caseDetails.client.id
+  const isClosed = caseDetails.status.status_name === 'Closed'
 
   return (
     <div className="container py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">{data.title}</h1>
+        <h1 className="text-2xl font-bold">{caseDetails.title}</h1>
         <p className="text-muted-foreground">
-          Created on {format(new Date(data.created_at), "PPP")}
+          Created on {format(new Date(caseDetails.created_at), "PPP")}
         </p>
       </div>
 
@@ -230,38 +171,40 @@ export function CaseDetailsPage() {
           <CardContent className="space-y-4">
             <div>
               <div className="font-medium">Description</div>
-              <p className="text-muted-foreground">{data.description}</p>
+              <p className="text-muted-foreground">{caseDetails.description}</p>
             </div>
             <div>
               <div className="font-medium">Client</div>
-              <p className="text-muted-foreground">{data.client.email}</p>
+              <p className="text-muted-foreground">{caseDetails.client.email}</p>
             </div>
             <div>
               <div className="font-medium">Status</div>
               <div className="flex items-center gap-4">
-                {isAgent ? (
+                {caseDetails.assigned_agent && (
                   <UpdateStatusDialog
-                    caseId={data.id}
-                    currentStatus={data.status}
+                    caseId={caseDetails.id}
+                    currentStatus={caseDetails.status}
                     onStatusUpdate={refetch}
                   />
-                ) : (
-                  <CaseStatusBadge status={data.status.status_name} />
+                )}
+                {!caseDetails.assigned_agent && (
+                  <CaseStatusBadge status={caseDetails.status.status_name} />
                 )}
               </div>
             </div>
             <div>
               <div className="font-medium">Assigned Agent</div>
               <div className="flex items-center gap-4">
-                {isAgent ? (
+                {caseDetails.assigned_agent && (
                   <AssignAgentDialog
-                    caseId={data.id}
-                    currentAgent={data.assigned_agent}
+                    caseId={caseDetails.id}
+                    currentAgent={caseDetails.assigned_agent}
                     onAgentUpdate={refetch}
                   />
-                ) : (
+                )}
+                {!caseDetails.assigned_agent && (
                   <p className="text-muted-foreground">
-                    {data.assigned_agent?.email || 'No agent assigned'}
+                    No agent assigned
                   </p>
                 )}
               </div>
@@ -277,7 +220,7 @@ export function CaseDetailsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AttachmentList caseId={data.id} />
+            <AttachmentList caseId={caseDetails.id} />
           </CardContent>
         </Card>
 
@@ -290,7 +233,7 @@ export function CaseDetailsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <FeedbackForm caseId={data.id} />
+              <FeedbackForm caseId={caseDetails.id} />
             </CardContent>
           </Card>
         )}
@@ -317,13 +260,13 @@ export function CaseDetailsPage() {
           <CollapsibleContent>
             <Card>
               <CardContent className="p-4">
-                <MessageList caseId={data.id} />
+                <MessageList caseId={caseDetails.id} />
               </CardContent>
             </Card>
           </CollapsibleContent>
         </Collapsible>
 
-        {isAgent && (
+        {caseDetails.assigned_agent && (
           <Collapsible
             open={isNotesOpen}
             onOpenChange={setIsNotesOpen}
@@ -344,7 +287,7 @@ export function CaseDetailsPage() {
             <CollapsibleContent>
               <Card>
                 <CardContent className="p-4">
-                  <InternalNoteList caseId={data.id} />
+                  <InternalNoteList caseId={caseDetails.id} />
                 </CardContent>
               </Card>
             </CollapsibleContent>
@@ -353,7 +296,7 @@ export function CaseDetailsPage() {
       </div>
 
       <FeedbackDialog
-        caseId={data.id}
+        caseId={caseDetails.id}
         isOpen={showFeedbackDialog}
         onOpenChange={setShowFeedbackDialog}
       />

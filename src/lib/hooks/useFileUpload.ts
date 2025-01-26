@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { v4 as uuidv4 } from 'uuid'
-import { FileObject } from '@supabase/storage-js'
 
 interface FileUploadOptions {
   caseId: string
@@ -15,11 +14,6 @@ interface UploadResult {
   file_path: string
   file_size: number
   file_type: string
-}
-
-interface UploadProgressEvent {
-  loaded: number
-  total: number
 }
 
 export function useFileUpload() {
@@ -43,13 +37,10 @@ export function useFileUpload() {
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('case-attachments')
+        .from('attachments')
         .upload(filePath, file, {
+          cacheControl: '3600',
           upsert: false,
-          onUploadProgress: (progress: UploadProgressEvent) => {
-            const percent = (progress.loaded / progress.total) * 100
-            setProgress(percent)
-          },
         })
 
       if (uploadError) throw uploadError
@@ -102,7 +93,7 @@ export function useFileUpload() {
     try {
       // Delete from storage
       const { error: storageError } = await supabase.storage
-        .from('case-attachments')
+        .from('attachments')
         .remove([filePath])
 
       if (storageError) throw storageError

@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { FileIcon, Loader2, Trash2, Download } from 'lucide-react'
+import { File, Loader2, Trash2, Download } from 'lucide-react'
 import { useFileUpload } from '@/lib/hooks/useFileUpload'
 import { supabase } from '@/lib/supabase'
-import { formatFileSize } from '@/lib/utils/format'
+import { formatFileSize } from '../../../lib/utils/format'
 
 interface FilePreviewProps {
   id: string
@@ -27,7 +27,35 @@ export function FilePreview({
 }: FilePreviewProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null)
   const { deleteFile } = useFileUpload()
+
+  // Generate signed URL for image thumbnails
+  useEffect(() => {
+    const loadThumbnail = async () => {
+      if (!fileType.startsWith('image/')) return
+
+      try {
+        const { data } = await supabase.storage
+          .from('case-attachments')
+          .createSignedUrl(filePath, 3600, {
+            transform: {
+              width: 80,
+              height: 80,
+              resize: 'cover'
+            }
+          })
+        
+        if (data?.signedUrl) {
+          setThumbnailUrl(data.signedUrl)
+        }
+      } catch (error) {
+        console.error('Error generating thumbnail URL:', error)
+      }
+    }
+
+    loadThumbnail()
+  }, [filePath, fileType])
 
   const handleDelete = async () => {
     try {
@@ -67,12 +95,6 @@ export function FilePreview({
   }
 
   const isImage = fileType.startsWith('image/')
-  const thumbnailUrl = isImage 
-    ? supabase.storage
-        .from('case-attachments')
-        .getPublicUrl(filePath)
-        .data.publicUrl
-    : null
 
   return (
     <div
@@ -90,7 +112,7 @@ export function FilePreview({
           />
         </div>
       ) : (
-        <FileIcon className="w-10 h-10 text-muted-foreground" />
+        <File className="w-10 h-10 text-muted-foreground" />
       )}
 
       <div className="flex-1 min-w-0">
@@ -106,9 +128,9 @@ export function FilePreview({
           disabled={isDownloading || isDeleting}
         >
           {isDownloading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Download className="w-4 h-4" />
+            <Download className="h-4 w-4" />
           )}
         </Button>
         <Button
@@ -116,12 +138,11 @@ export function FilePreview({
           size="icon"
           onClick={handleDelete}
           disabled={isDownloading || isDeleting}
-          className="text-destructive hover:text-destructive"
         >
           {isDeleting ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="h-4 w-4" />
           )}
         </Button>
       </div>

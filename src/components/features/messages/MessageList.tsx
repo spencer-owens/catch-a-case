@@ -5,9 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { MessageAttachments } from '@/components/features/attachments/MessageAttachments'
-import { useMessageAttachments } from '@/lib/hooks/useAttachments'
-import { Paperclip } from 'lucide-react'
 
 interface MessageListProps {
   caseId: string
@@ -20,7 +17,6 @@ export function MessageList({ caseId, className }: MessageListProps) {
   const isAdmin = user?.user_metadata?.role === 'admin'
   const [content, setContent] = React.useState('')
   const [isSending, setIsSending] = React.useState(false)
-  const [showUpload, setShowUpload] = React.useState(false)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
 
   const scrollToBottom = React.useCallback(() => {
@@ -62,7 +58,6 @@ export function MessageList({ caseId, className }: MessageListProps) {
               message={message}
               isOwn={message.sender_id === user?.id}
               isAdmin={isAdmin}
-              caseId={caseId}
             />
           ))}
           <div ref={messagesEndRef} />
@@ -77,25 +72,10 @@ export function MessageList({ caseId, className }: MessageListProps) {
             placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
             className="min-h-[80px]"
           />
-          <div className="flex flex-col gap-2">
-            <Button type="submit" disabled={isSending || !content.trim()}>
-              Send
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => setShowUpload(!showUpload)}
-            >
-              <Paperclip className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button type="submit" disabled={isSending || !content.trim()}>
+            Send
+          </Button>
         </div>
-        {showUpload && (
-          <div className="pt-2 border-t">
-            <MessageAttachments caseId={caseId} messageId={messages[messages.length - 1]?.id} />
-          </div>
-        )}
       </form>
     </div>
   )
@@ -105,11 +85,9 @@ interface MessageBubbleProps {
   message: Message
   isOwn: boolean
   isAdmin: boolean
-  caseId: string
 }
 
-function MessageBubble({ message, isOwn, isAdmin, caseId }: MessageBubbleProps) {
-  const { data: attachments } = useMessageAttachments(message.id)
+function MessageBubble({ message, isOwn, isAdmin }: MessageBubbleProps) {
   // For admins, we want to show agent messages on the right with primary color
   const isAgentMessage = message.sender_id === message.case_agent_id
 
@@ -134,23 +112,6 @@ function MessageBubble({ message, isOwn, isAdmin, caseId }: MessageBubbleProps) 
         <p className="text-sm whitespace-pre-wrap break-words">
           {message.message_content}
         </p>
-        {attachments && attachments.length > 0 && (
-          <div className="mt-2 space-y-2">
-            {attachments.map((attachment) => (
-              <div
-                key={attachment.id}
-                className={cn(
-                  'rounded p-2 text-xs',
-                  shouldUsePrimaryStyle
-                    ? 'bg-primary-foreground/10 text-primary-foreground'
-                    : 'bg-background text-foreground'
-                )}
-              >
-                📎 {attachment.file_name}
-              </div>
-            ))}
-          </div>
-        )}
         <span className="text-xs opacity-70 mt-1 block">
           {new Date(message.created_at).toLocaleTimeString()}
         </span>
