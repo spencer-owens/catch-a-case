@@ -1,7 +1,8 @@
-import { LoginForm } from '@/components/auth/login-form'
+import { LoginForm } from '../../components/auth/login-form'
 import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
+import { Button } from '../../components/ui/button'
 import { useState } from 'react'
+import { MainLayout } from '../../components/layout/main-layout'
 
 interface PresetUser {
   label: string
@@ -39,7 +40,7 @@ export function LoginPage() {
   const [selectedUser, setSelectedUser] = useState<PresetUser | null>(null)
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <MainLayout showNav={false} className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md">
         <h1 className="text-4xl font-bold text-center mb-8">Catch a Case</h1>
         <LoginForm key={selectedUser?.email} defaultEmail={selectedUser?.email} defaultPassword={selectedUser?.password} />
@@ -51,6 +52,6 @@ export function LoginPage() {
         </p>
         <PresetUsers onSelect={setSelectedUser} />
       </div>
-    </div>
+    </MainLayout>
   )
 } 

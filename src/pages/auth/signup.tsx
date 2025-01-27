@@ -1,9 +1,10 @@
-import { SignUpForm } from '@/components/auth/signup-form'
+import { SignUpForm } from '../../components/auth/signup-form'
 import { Link } from 'react-router-dom'
+import { MainLayout } from '../../components/layout/main-layout'
 
 export function SignUpPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <MainLayout showNav={false} className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md">
         <h1 className="text-4xl font-bold text-center mb-8">Catch a Case</h1>
         <SignUpForm />
@@ -14,6 +15,6 @@ export function SignUpPage() {
           </Link>
         </p>
       </div>
-    </div>
+    </MainLayout>
   )
 } 

@@ -1,6 +1,8 @@
+import * as React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from '@/lib/context/auth-context'
 import { ProtectedRoute } from '@/components/auth/protected-route'
+import { MainLayout } from '@/components/layout/main-layout'
 import { LoginPage } from '@/pages/auth/login'
 import { SignUpPage } from '@/pages/auth/signup'
 import { AuthCallback } from '@/pages/auth/callback'
@@ -14,17 +16,19 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Public Routes */}
+          {/* Public Routes - No Layout */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 
-          {/* Protected Routes */}
+          {/* Protected Routes - With Layout */}
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <DashboardPage />
+                <MainLayout>
+                  <DashboardPage />
+                </MainLayout>
               </ProtectedRoute>
             }
           />
@@ -33,7 +37,9 @@ function App() {
             path="/cases/create"
             element={
               <ProtectedRoute>
-                <CreateCasePage />
+                <MainLayout>
+                  <CreateCasePage />
+                </MainLayout>
               </ProtectedRoute>
             }
           />
@@ -42,7 +48,9 @@ function App() {
             path="/cases/:id"
             element={
               <ProtectedRoute>
-                <CaseDetailsPage />
+                <MainLayout>
+                  <CaseDetailsPage />
+                </MainLayout>
               </ProtectedRoute>
             }
           />
