@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { useAuth } from '@/lib/hooks/useAuth'
@@ -15,7 +15,7 @@ export interface InternalNote {
 
 export function useInternalNotes(caseId: string) {
   const { user } = useAuth()
-  const [newNotes, setNewNotes] = useState<InternalNote[]>([])
+  const queryClient = useQueryClient()
 
   // Fetch initial notes
   const { data: notes = [] } = useQuery({
@@ -35,7 +35,7 @@ export function useInternalNotes(caseId: string) {
   // Set up real-time subscription
   useEffect(() => {
     const channel = supabase
-      .channel('internal-notes-channel')
+      .channel(`internal-notes-${caseId}`)
       .on(
         'postgres_changes',
         {
@@ -46,7 +46,13 @@ export function useInternalNotes(caseId: string) {
         },
         (payload) => {
           const newNote = payload.new as InternalNote
-          setNewNotes((prev) => [...prev, newNote])
+          
+          // Update React Query cache
+          queryClient.setQueryData(['internal_notes', caseId], (old: InternalNote[] = []) => {
+            return [...old, newNote]
+          })
+
+          // Show notification for others' notes
           if (newNote.agent_id !== user?.id) {
             toast('New Internal Note', {
               description: 'A new internal note has been added',
@@ -59,7 +65,7 @@ export function useInternalNotes(caseId: string) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [caseId, user?.id])
+  }, [caseId, user?.id, queryClient])
 
   // Add a new note
   const addNote = async (content: string) => {
@@ -71,20 +77,14 @@ export function useInternalNotes(caseId: string) {
 
     if (error) {
       toast.error('Error', {
-        description: 'Failed to add internal note',
+        description: 'Failed to add note',
       })
       throw error
     }
   }
 
-  // Combine and sort all notes
-  const allNotes = [...notes, ...newNotes].sort(
-    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-  )
-
   return {
-    notes: allNotes,
+    notes,
     addNote,
-    isLoading: false,
   }
 } 

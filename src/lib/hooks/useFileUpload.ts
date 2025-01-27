@@ -37,7 +37,7 @@ export function useFileUpload() {
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('attachments')
+        .from('case-attachments')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
@@ -93,7 +93,7 @@ export function useFileUpload() {
     try {
       // Delete from storage
       const { error: storageError } = await supabase.storage
-        .from('attachments')
+        .from('case-attachments')
         .remove([filePath])
 
       if (storageError) throw storageError

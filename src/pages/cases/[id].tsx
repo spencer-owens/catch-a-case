@@ -151,7 +151,8 @@ export function CaseDetailsPage() {
     )
   }
 
-  const isClient = user?.id === caseDetails.client.id
+  const isClient = user?.user_metadata?.role === 'client'
+  const isAgent = user?.user_metadata?.role === 'agent' || user?.user_metadata?.role === 'admin'
   const isClosed = caseDetails.status.status_name === 'Closed'
 
   return (
@@ -180,14 +181,13 @@ export function CaseDetailsPage() {
             <div>
               <div className="font-medium">Status</div>
               <div className="flex items-center gap-4">
-                {caseDetails.assigned_agent && (
+                {isAgent ? (
                   <UpdateStatusDialog
                     caseId={caseDetails.id}
                     currentStatus={caseDetails.status}
                     onStatusUpdate={refetch}
                   />
-                )}
-                {!caseDetails.assigned_agent && (
+                ) : (
                   <CaseStatusBadge status={caseDetails.status.status_name} />
                 )}
               </div>
@@ -195,16 +195,15 @@ export function CaseDetailsPage() {
             <div>
               <div className="font-medium">Assigned Agent</div>
               <div className="flex items-center gap-4">
-                {caseDetails.assigned_agent && (
+                {isAgent ? (
                   <AssignAgentDialog
                     caseId={caseDetails.id}
                     currentAgent={caseDetails.assigned_agent}
                     onAgentUpdate={refetch}
                   />
-                )}
-                {!caseDetails.assigned_agent && (
+                ) : (
                   <p className="text-muted-foreground">
-                    No agent assigned
+                    {caseDetails.assigned_agent?.email || 'No agent assigned'}
                   </p>
                 )}
               </div>
@@ -266,7 +265,7 @@ export function CaseDetailsPage() {
           </CollapsibleContent>
         </Collapsible>
 
-        {caseDetails.assigned_agent && (
+        {isAgent && (
           <Collapsible
             open={isNotesOpen}
             onOpenChange={setIsNotesOpen}

@@ -7,8 +7,9 @@ import './index.css'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
+      staleTime: 0, // Always fetch fresh data
+      refetchOnWindowFocus: true, // Refetch when window regains focus
+      refetchInterval: false, // Don't poll automatically (we use Supabase real-time)
     },
   },
 })

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { useAuth } from '@/lib/hooks/useAuth'
@@ -16,7 +16,7 @@ export interface Message {
 
 export function useMessages(caseId: string) {
   const { user } = useAuth()
-  const [newMessages, setNewMessages] = useState<Message[]>([])
+  const queryClient = useQueryClient()
 
   // Fetch initial messages
   const { data: messages = [] } = useQuery({
@@ -35,7 +35,6 @@ export function useMessages(caseId: string) {
 
       if (error) throw error
       
-      // Transform the data to include case_agent_id
       return data.map((message: any) => ({
         ...message,
         case_agent_id: message.cases.assigned_agent_id
@@ -46,7 +45,7 @@ export function useMessages(caseId: string) {
   // Set up real-time subscription
   useEffect(() => {
     const channel = supabase
-      .channel('messages-channel')
+      .channel(`messages-${caseId}`)
       .on(
         'postgres_changes',
         {
@@ -55,9 +54,36 @@ export function useMessages(caseId: string) {
           table: 'messages',
           filter: `case_id=eq.${caseId}`,
         },
-        (payload) => {
+        async (payload) => {
           const newMsg = payload.new as Message
-          setNewMessages((prev) => [...prev, newMsg])
+          
+          // Fetch the complete message data including the case_agent_id
+          const { data, error } = await supabase
+            .from('messages')
+            .select(`
+              *,
+              cases!inner (
+                assigned_agent_id
+              )
+            `)
+            .eq('id', newMsg.id)
+            .single()
+
+          if (error) {
+            console.error('Error fetching complete message:', error)
+            return
+          }
+
+          // Update React Query cache
+          queryClient.setQueryData(['messages', caseId], (old: Message[] = []) => {
+            const newMessage = {
+              ...data,
+              case_agent_id: data.cases.assigned_agent_id
+            }
+            return [...old, newMessage]
+          })
+
+          // Show notification for others' messages
           if (newMsg.sender_id !== user?.id) {
             toast('New Message', {
               description: 'You have received a new message',
@@ -70,7 +96,7 @@ export function useMessages(caseId: string) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [caseId, user?.id])
+  }, [caseId, user?.id, queryClient])
 
   // Send a new message
   const sendMessage = async (content: string) => {
@@ -88,13 +114,8 @@ export function useMessages(caseId: string) {
     }
   }
 
-  // Combine and sort all messages
-  const allMessages = [...messages, ...newMessages].sort(
-    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-  )
-
   return {
-    messages: allMessages,
+    messages,
     sendMessage,
     isLoading: false,
   }
