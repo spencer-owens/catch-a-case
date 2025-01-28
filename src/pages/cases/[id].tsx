@@ -7,13 +7,12 @@ import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CaseStatusBadge } from "@/components/cases/case-status-badge"
 import { UpdateStatusDialog } from "@/components/cases/update-status-dialog"
 import { AssignAgentDialog } from "@/components/cases/assign-agent-dialog"
 import { MessageList } from "@/components/features/messages/MessageList"
 import { InternalNoteList } from "@/components/features/notes/InternalNoteList"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, ChevronUp } from 'lucide-react'
 import { AttachmentList } from "@/components/features/attachments/AttachmentList"
 import { FeedbackDialog } from "@/components/features/feedback/FeedbackDialog"
 import { FeedbackForm } from "@/components/features/feedback/FeedbackForm"
@@ -56,8 +55,6 @@ export function CaseDetailsPage() {
   const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [isMessagesOpen, setIsMessagesOpen] = React.useState(true)
-  const [isNotesOpen, setIsNotesOpen] = React.useState(false)
   const [showFeedbackDialog, setShowFeedbackDialog] = React.useState(false)
   
   const { data: caseDetails, isLoading, refetch } = useQuery<CaseDetails>({
@@ -156,7 +153,7 @@ export function CaseDetailsPage() {
   const isClosed = caseDetails.status.status_name === 'Closed'
 
   return (
-    <div className="container py-6">
+    <div className="container py-6 min-h-[calc(100vh-4rem)]">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">{caseDetails.title}</h1>
         <p className="text-muted-foreground">
@@ -164,134 +161,105 @@ export function CaseDetailsPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Case Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="font-medium">Description</div>
-              <p className="text-muted-foreground">{caseDetails.description}</p>
-            </div>
-            <div>
-              <div className="font-medium">Client</div>
-              <p className="text-muted-foreground">{caseDetails.client.email}</p>
-            </div>
-            <div>
-              <div className="font-medium">Status</div>
-              <div className="flex items-center gap-4">
-                {isAgent ? (
-                  <UpdateStatusDialog
-                    caseId={caseDetails.id}
-                    currentStatus={caseDetails.status}
-                    onStatusUpdate={refetch}
-                  />
-                ) : (
-                  <CaseStatusBadge status={caseDetails.status.status_name} />
-                )}
-              </div>
-            </div>
-            <div>
-              <div className="font-medium">Assigned Agent</div>
-              <div className="flex items-center gap-4">
-                {isAgent ? (
-                  <AssignAgentDialog
-                    caseId={caseDetails.id}
-                    currentAgent={caseDetails.assigned_agent}
-                    onAgentUpdate={refetch}
-                  />
-                ) : (
-                  <p className="text-muted-foreground">
-                    {caseDetails.assigned_agent?.email || 'No agent assigned'}
-                  </p>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Files & Attachments</CardTitle>
-            <CardDescription>
-              Upload and manage case-related documents
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AttachmentList caseId={caseDetails.id} />
-          </CardContent>
-        </Card>
-
-        {isClient && isClosed && (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-12rem)]">
+        {/* Left Panel - Case Information */}
+        <div className="lg:col-span-5 space-y-6 overflow-y-auto">
           <Card>
             <CardHeader>
-              <CardTitle>Feedback</CardTitle>
+              <CardTitle>Case Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="font-medium">Description</div>
+                <p className="text-muted-foreground">{caseDetails.description}</p>
+              </div>
+              <div>
+                <div className="font-medium">Client</div>
+                <p className="text-muted-foreground">{caseDetails.client.email}</p>
+              </div>
+              <div>
+                <div className="font-medium">Status</div>
+                <div className="flex items-center gap-4">
+                  {isAgent ? (
+                    <UpdateStatusDialog
+                      caseId={caseDetails.id}
+                      currentStatus={caseDetails.status}
+                      onStatusUpdate={refetch}
+                    />
+                  ) : (
+                    <CaseStatusBadge status={caseDetails.status.status_name} />
+                  )}
+                </div>
+              </div>
+              <div>
+                <div className="font-medium">Assigned Agent</div>
+                <div className="flex items-center gap-4">
+                  {isAgent ? (
+                    <AssignAgentDialog
+                      caseId={caseDetails.id}
+                      currentAgent={caseDetails.assigned_agent}
+                      onAgentUpdate={refetch}
+                    />
+                  ) : (
+                    <p className="text-muted-foreground">
+                      {caseDetails.assigned_agent?.email || 'No agent assigned'}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Files & Attachments</CardTitle>
               <CardDescription>
-                Share your experience with our service
+                Upload and manage case-related documents
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <FeedbackForm caseId={caseDetails.id} />
+              <AttachmentList caseId={caseDetails.id} />
             </CardContent>
           </Card>
-        )}
-      </div>
 
-      <div className="mt-6 space-y-6">
-        <Collapsible
-          open={isMessagesOpen}
-          onOpenChange={setIsMessagesOpen}
-          className="space-y-2"
-        >
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Messages</h2>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm">
-                {isMessagesOpen ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          <CollapsibleContent>
+          {isClient && isClosed && (
             <Card>
-              <CardContent className="p-4">
-                <MessageList caseId={caseDetails.id} />
+              <CardHeader>
+                <CardTitle>Feedback</CardTitle>
+                <CardDescription>
+                  Share your experience with our service
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FeedbackForm caseId={caseDetails.id} />
               </CardContent>
             </Card>
-          </CollapsibleContent>
-        </Collapsible>
+          )}
+        </div>
 
-        {isAgent && (
-          <Collapsible
-            open={isNotesOpen}
-            onOpenChange={setIsNotesOpen}
-            className="space-y-2"
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Internal Notes</h2>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  {isNotesOpen ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
+        {/* Right Panel - Communication */}
+        <div className="lg:col-span-7 flex flex-col h-full">
+          <Card className="flex-1 flex flex-col overflow-hidden">
+            <CardHeader className="flex-shrink-0 pb-0">
+              <Tabs defaultValue="messages" className="w-full">
+                <TabsList className="w-full">
+                  <TabsTrigger value="messages" className="flex-1">Messages</TabsTrigger>
+                  {isAgent && (
+                    <TabsTrigger value="notes" className="flex-1">Internal Notes</TabsTrigger>
                   )}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent>
-              <Card>
-                <CardContent className="p-4">
-                  <InternalNoteList caseId={caseDetails.id} />
-                </CardContent>
-              </Card>
-            </CollapsibleContent>
-          </Collapsible>
-        )}
+                </TabsList>
+                <TabsContent value="messages" className="flex-1 overflow-hidden">
+                  <MessageList caseId={caseDetails.id} />
+                </TabsContent>
+                {isAgent && (
+                  <TabsContent value="notes" className="flex-1 overflow-hidden">
+                    <InternalNoteList caseId={caseDetails.id} />
+                  </TabsContent>
+                )}
+              </Tabs>
+            </CardHeader>
+          </Card>
+        </div>
       </div>
 
       <FeedbackDialog

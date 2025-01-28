@@ -12,4 +12,5 @@ afterEach(() => {
 })
 
 // Make vi available globally
+// @ts-expect-error - vi is a valid global in tests
 globalThis.vi = vi 

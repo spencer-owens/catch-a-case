@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../lib/context/auth-context'
 import { Button } from '../ui/button'
 import { cn } from '../../lib/utils'
@@ -13,7 +13,6 @@ interface MainLayoutProps {
 export function MainLayout({ children, className, showNav = true }: MainLayoutProps) {
   const { user, signOut } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
 
   const isActive = (path: string) => location.pathname === path
 

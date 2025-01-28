@@ -99,12 +99,12 @@ export function FilePreview({
   return (
     <div
       className={cn(
-        'group relative flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors',
+        'group relative flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors max-w-full',
         className
       )}
     >
       {isImage && thumbnailUrl ? (
-        <div className="w-10 h-10 rounded overflow-hidden bg-muted">
+        <div className="flex-shrink-0 w-10 h-10 rounded overflow-hidden bg-muted">
           <img
             src={thumbnailUrl}
             alt={fileName}
@@ -112,15 +112,17 @@ export function FilePreview({
           />
         </div>
       ) : (
-        <File className="w-10 h-10 text-muted-foreground" />
+        <File className="flex-shrink-0 w-10 h-10 text-muted-foreground" />
       )}
 
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{fileName}</p>
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <p className="text-sm font-medium truncate max-w-[calc(100%-4rem)]" title={fileName}>
+          {fileName}
+        </p>
         <p className="text-xs text-muted-foreground">{formatFileSize(fileSize)}</p>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-shrink-0">
         <Button
           variant="ghost"
           size="icon"
