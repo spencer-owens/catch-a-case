@@ -8,6 +8,7 @@ import { AuthCallback } from '@/pages/auth/callback'
 import { DashboardPage } from '@/pages/dashboard'
 import { CreateCasePage } from '@/pages/cases/create'
 import { CaseDetailsPage } from '@/pages/cases/[id]'
+import { LandingPage } from '@/pages/landing'
 import { Toaster } from '@/components/ui/toaster'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
       <AuthProvider>
         <Routes>
           {/* Public Routes - No Layout */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
@@ -54,23 +56,11 @@ function App() {
             }
           />
 
-          {/* Redirect root to dashboard or login */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Navigate to="/dashboard" replace />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Catch all - redirect to dashboard if authenticated, otherwise to login */}
+          {/* Catch all - redirect to dashboard if authenticated, otherwise to landing */}
           <Route
             path="*"
             element={
-              <ProtectedRoute>
-                <Navigate to="/dashboard" replace />
-              </ProtectedRoute>
+              <Navigate to="/" replace />
             }
           />
         </Routes>
