@@ -21,7 +21,12 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # Validate CORS origins
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
+DEFAULT_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://catch-a-case.vercel.app"
+]
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", ",".join(DEFAULT_ORIGINS)).split(",")
 logger.info(f"Configured CORS origins: {ALLOWED_ORIGINS}")
 
 @asynccontextmanager
