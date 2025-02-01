@@ -34,6 +34,11 @@ interface CaseDetails {
     id: string
     status_name: string
   }
+  custom_fields?: {
+    ai_assignment_explanation?: string
+    ai_confidence_score?: number
+    case_tags?: string[]
+  }
 }
 
 function CaseSkeleton() {
@@ -69,7 +74,8 @@ export function CaseDetailsPage() {
           created_at,
           client:client_id(id, email),
           assigned_agent:assigned_agent_id(id, email),
-          status:status_id(id, status_name)
+          status:status_id(id, status_name),
+          custom_fields
         `)
         .eq('id', id)
         .single()
@@ -206,6 +212,39 @@ export function CaseDetailsPage() {
                     </p>
                   )}
                 </div>
+                {caseDetails.custom_fields?.ai_assignment_explanation && (
+                  <div className="mt-2 space-y-2">
+                    <div>
+                      <div className="font-medium text-sm text-muted-foreground">AI Assignment Explanation</div>
+                      <p className="text-sm text-muted-foreground">
+                        {caseDetails.custom_fields.ai_assignment_explanation}
+                      </p>
+                    </div>
+                    {caseDetails.custom_fields.ai_confidence_score !== undefined && (
+                      <div>
+                        <div className="font-medium text-sm text-muted-foreground">AI Confidence</div>
+                        <p className="text-sm text-muted-foreground">
+                          {Math.round(caseDetails.custom_fields.ai_confidence_score * 100)}%
+                        </p>
+                      </div>
+                    )}
+                    {caseDetails.custom_fields?.case_tags && caseDetails.custom_fields.case_tags.length > 0 && (
+                      <div>
+                        <div className="font-medium text-sm text-muted-foreground">Case Tags</div>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {caseDetails.custom_fields.case_tags.map((tag, index) => (
+                            <span 
+                              key={index}
+                              className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

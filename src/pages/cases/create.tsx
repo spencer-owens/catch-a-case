@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/use-toast'
+import { useAIAssignment } from '@/hooks/useAIAssignment'
 
 const createCaseSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -23,6 +24,7 @@ export function CreateCasePage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const { assignCaseToAgent } = useAIAssignment()
 
   const form = useForm<CreateCaseForm>({
     resolver: zodResolver(createCaseSchema),
@@ -58,13 +60,16 @@ export function CreateCasePage() {
       if (caseError) throw caseError
       return newCase
     },
-    onSuccess: () => {
+    onSuccess: async (newCase) => {
       // Invalidate the cases query to trigger a refetch
       queryClient.invalidateQueries({ queryKey: ['cases'] })
       
+      // Trigger AI assignment with both title and description
+      await assignCaseToAgent(newCase.id, newCase.title, newCase.description)
+      
       toast({
         title: 'Case Created',
-        description: 'Your case has been successfully created.',
+        description: 'Your case has been successfully created and is being assigned to an agent.',
       })
 
       navigate('/dashboard')
@@ -89,7 +94,7 @@ export function CreateCasePage() {
         <CardHeader>
           <CardTitle>Create New Case</CardTitle>
           <CardDescription>
-            Submit a new case for review. We'll assign an agent to assist you shortly.
+            Submit a new case for review. Our AI will assign the most suitable agent to assist you.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -117,7 +122,7 @@ export function CreateCasePage() {
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Detailed description of your case"
+                        placeholder="Please provide a detailed description of your case. This will help us assign the most appropriate agent."
                         className="min-h-[120px]"
                         {...field}
                       />

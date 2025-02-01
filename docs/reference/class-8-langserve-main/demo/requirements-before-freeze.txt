@@ -1,0 +1,9 @@
+langchain
+langchain_openai
+langchain_core
+langchain_community
+langserve
+fastapi
+faiss-cpu
+sse_starlette
+python-dotenv
